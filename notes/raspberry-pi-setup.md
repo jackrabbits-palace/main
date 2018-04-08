@@ -57,6 +57,7 @@ you should see it in the results :)
 
 #### (3) flash image to SD card
 i will be using a built-in linux command called `dd` (to convert and copy a file) to flash the OS image onto the SD card. user beware! `dd` can overwrite partitions on your computer if you do not use it correctly! for less dangerous options, one could consider using [Etcher](https://etcher.io/) as recommended by the official Raspberry Pi docs. i like `dd` because it is a straight-forward command and does exactly what we want without having to install anything extra. plus i always find it really refreshing when i understand things at a lower level of abstraction. *aaaahhhhhhhh*- a refreshing sip of `dd`.
+![alt-text](https://media.giphy.com/media/a0q8vE3WKTIzK/giphy.gif)
 
 to flash the OS image to the SD card we perform the following command,
 
