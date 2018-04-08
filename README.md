@@ -1,2 +1,3 @@
-# jackrabbits-palace
-:rabbit: :jack_o_lantern: all-in-one reverse-proxy | DDNS client | ssh tunnel for us :jack_o_lantern: :rabbit:
+# JackRabbit's Palace
+
+Welcome, you've finally arrived! Welcome to our threshold. We are so happy to have you. "Where am I", you ask?. You are at entryway to our palace, on the brink of a portal to strange worlds.
