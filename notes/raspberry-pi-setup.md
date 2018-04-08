@@ -64,7 +64,10 @@ to flash the OS image to the SD card we perform the following command,
 $ dd bs=4M if=raspbian-stretch-lite.img of=/dev/sdd conv=fsync
 ```
 
-where `bs` is the block size. (4m is the natural block size in SD storage, so specifying this will make the transfer go faster.). `if` is the input file that we actually want to flash to our SD storage-- in our case it is the Raspbian OS image file. `of` is the output file which corresponds to the device we want to be flashing our OS image to-- in our case this is `/dev/sdd` (note though, that your SD storage device will probably have a different name so you need to use that). `conv=fsync` basically tells the `dd` command to actually persist the data onto the disk after the operation is complete (this is important because sometimes for optimization reasons (?) the data is only persisted in memory and not on disk???).
+* `bs` is the block size. (4m is the natural block size in SD storage, so specifying this will make the transfer go faster.).
+* `if` is the input file that we actually want to flash to our SD storage-- in our case it is the Raspbian OS image file.
+* `of` is the output file which corresponds to the device we want to be flashing our OS image to-- in our case this is `/dev/sdd` (note though, that your SD storage device will probably have a different name so you need to use that).
+* `conv=fsync` basically tells the `dd` command to actually persist the data onto the disk after the operation is complete (this is important because sometimes for optimization reasons (?) the data is only persisted in memory and not on disk???).
 
 this command will take a few minutes to complete, so maybe you can get a cup of coffee and chat with your pals.
 
