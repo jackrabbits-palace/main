@@ -56,7 +56,7 @@ $ ls /dev
 you should see it in the results :)
 
 #### (3) flash image to SD card
-i will be using a built-in linux command called `dd` (to convert and copy a file) to flash the OS image onto the SD card. user beware! `dd` can overwrite partitions on your computer if you do not use it correctly! for less dangerous options, one could consider using [Etcher](https://etcher.io/) as recommended by the official Raspberry Pi docs. i like `dd` because it is a straight-forward command and does exactly what we want without having to install anything extra. plus i always find it really refreshing when i understand things at a lower level of abstraction.
+i will be using a built-in linux command called `dd` (to convert and copy a file) to flash the OS image onto the SD card. user beware! `dd` can overwrite partitions on your computer if you do not use it correctly! for less dangerous options, one could consider using [Etcher](https://etcher.io/) as recommended by the official Raspberry Pi docs. i like `dd` because it is a straight-forward command and does exactly what we want without having to install anything extra. plus i always find it really refreshing when i understand things at a lower level of abstraction. *aaaahhhhhhhh*- a refreshing sip of `dd`.
 
 to flash the OS image to the SD card we perform the following command,
 
@@ -64,7 +64,22 @@ to flash the OS image to the SD card we perform the following command,
 $ dd bs=4M if=raspbian-stretch-lite.img of=/dev/sdd conv=fsync
 ```
 
-where `bs` is the block size.
+where `bs` is the block size. (4m is the natural block size in SD storage, so specifying this will make the transfer go faster.). `if` is the input file that we actually want to flash to our SD storage-- in our case it is the Raspbian OS image file. `of` is the output file which corresponds to the device we want to be flashing our OS image to-- in our case this is `/dev/sdd` (note though, that your SD storage device will probably have a different name so you need to use that). `conv=fsync` basically tells the `dd` command to actually persist the data onto the disk after the operation is complete (this is important because sometimes for optimization reasons (?) the data is only persisted in memory and not on disk???).
+
+this command will take a few minutes to complete, so maybe you can get a cup of coffee and chat with your pals.
+
+#### (4) mount our new raspbian boot partition
+after we have flashed the OS to our SD storage, we should now have a boot and root partition on our SD storage disk. we can verify this by again running `lsblk` and see some nested partitions,
+
+``` shell
+$ lsblk
+NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sdd           8:48   1   3.7G  0 disk
+nvme0n1     259:0    0 953.9G  0 disk
+├─nvme0n1p1 259:1    0     1G  0 part /boot
+├─nvme0n1p2 259:2    0    20G  0 part /
+└─nvme0n1p3 259:3    0 429.5G  0 part /home
+```
 
 now we want to mount this disk onto our computer's filesystem. i typically mount disks in the `/mnt/` directory. we can do this with
 
