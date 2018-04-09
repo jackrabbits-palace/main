@@ -4,8 +4,8 @@ now that we have a fresh installation of *Raspbian Stretch-lite* which we can ss
 * **[adding user accounts](#add-usr-accounts)**
 * **[copying ssh public keys](#copy-ssh-public-keys)**
 * **[changing the hostname](#change-hostname)**
-* TODO **[disabling passwd login](#disable-passwd-login)**
-* TODO **[adding a firewall](#add-a-firewall)**
+* **[disabling passwd login](#disable-passwd-login)**
+* **[adding a firewall](#add-a-firewall)**
 
 ## Change Pi Usr Passwd
 
@@ -43,7 +43,7 @@ LISTEN      0      128                            :::22                         
 great, we are only listening on port 22 (ssh)
 
 #### install `ufw`
-we want to install *Uncomplicated Firewall`, or `ufw`,
+we want to install *Uncomplicated Firewall*, or `ufw`,
 
 ```
 $ sudo apt-get install ufw
@@ -67,7 +67,7 @@ $ sudo ufw allow in www  # 80/tcp for standard http traffic
 $ sudo ufw allow out www
 $ sudo ufw allow in 443/tcp  # for serving tls certs
 $ sudo ufw allow out 443/tcp
-$
+
 $ sudo ufw allow in 9050/tcp  # for tor proxy port (all traffic through the tor network starts here)
 $ sudo ufw allow out 9050/tcp
 $ sudo ufw allow in 9051/tcp  # for tor control port (any tor controlling application talks to tor through this listening port (note, it is unclear whether this ports needs to be exposed though))
