@@ -74,7 +74,7 @@ $ sudo dd bs=4M if=raspbian-stretch-lite.img of=/dev/sdd conv=fsync
 
 this command will take a few minutes to complete, so maybe you can get a cup of coffee and chat with your pals.
 
-#### (4) mount our new raspbian boot & root partitions
+## Mount Root/Boot Partitions
 after we have flashed the OS to our SD storage, we should now have a boot and root partition on our SD storage disk. we can verify this by again running `lsblk` and see some nested partitions,
 
 ``` shell
@@ -90,8 +90,16 @@ nvme0n1     259:0    0 953.9G  0 disk
 ```
 cool, we now have `sdd1` (boot partition) and `sdd2` (root partition) as partitions of our `sdd` disk.
 
-lets verify that everything looks good by mounting each partition and checking them visually. mount this partitions onto our computer's filesystem using `mount`. i typically mount disks in the `/mnt/` directory. lets mount and look at the boot partition, it should look like this,
+lets mount and look at the root partition and checking them visually. mount this partitions onto our computer's filesystem using `mount`. i typically mount disks in the `/mnt/` directory. lets mount and look at the boot partition, it should look like this,
 
+``` shell
+$ sudo mount /dev/sdd2 /mnt/usb1
+$ ls /mnt/usb1
+bin  boot  dev  etc  home  lib  lost+found  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+$ sudo umount /mnt/usb1
+```
+
+similarly, lets verify that everything looks good by mounting each partition, it should look like this,
 ``` shell
 $ sudo mount /dev/sdd1 /mnt/usb1
 $ ls /mnt/usb1
@@ -103,15 +111,21 @@ bcm2709-rpi-2-b.dtb     cmdline.txt               fixup_db.dat   LICENCE.broadco
 $ sudo umount /mnt/usb1
 ```
 
-lets mount and look at the root partition, it should look like this,
+## Enable SSH
+since 2016 or something, Raspbian has had ssh disabled by default. since we intend to access our headless pi strictly via ssh, we need to enable it! luckily, all we need to do is put an empty file in the boot partition called `ssh` and this will enable ssh when the pi boots. again we can mount our boot partition and then make an empty file there called `ssh`,
 
 ``` shell
-$ sudo mount /dev/sdd2 /mnt/usb1
-$ ls /mnt/usb1
-bin  boot  dev  etc  home  lib  lost+found  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+$ sudo mount /dev/sdd1 /mnt/usb1
+$ sudo touch /mnt/usb1/ssh
 $ sudo umount /mnt/usb1
 ```
 
+## Boot Up
+now we can connect to ethernet and boot up. if you are able to then ssh into the pi from you computer you are good!
+
+``` shell
+$ ssh pi@raspberrypi.local  # passwd is raspberry by default
+```
 
 ## Resources
 [Official Raspbian Installation Guide](https://www.raspberrypi.org/documentation/installation/installing-images/README.md)
