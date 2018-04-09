@@ -57,12 +57,14 @@ you should see it in the results :)
 
 #### (3) flash image to SD card
 i will be using a built-in linux command called `dd` (to convert and copy a file) to flash the OS image onto the SD card. user beware! `dd` can overwrite partitions on your computer if you do not use it correctly! for less dangerous options, one could consider using [Etcher](https://etcher.io/) as recommended by the official Raspberry Pi docs. i like `dd` because it is a straight-forward command and does exactly what we want without having to install anything extra. plus i always find it really refreshing when i understand things at a lower level of abstraction. *aaaahhhhhhhh*- a refreshing sip of `dd`.
+
+
 ![alt-text](https://media.giphy.com/media/a0q8vE3WKTIzK/giphy.gif)
 
 to flash the OS image to the SD card we perform the following command,
 
 ``` shell
-$ dd bs=4M if=raspbian-stretch-lite.img of=/dev/sdd conv=fsync
+$ sudo dd bs=4M if=raspbian-stretch-lite.img of=/dev/sdd conv=fsync
 ```
 
 * `bs` is the block size. (4m is the natural block size in SD storage, so specifying this will make the transfer go faster.).
@@ -72,24 +74,44 @@ $ dd bs=4M if=raspbian-stretch-lite.img of=/dev/sdd conv=fsync
 
 this command will take a few minutes to complete, so maybe you can get a cup of coffee and chat with your pals.
 
-#### (4) mount our new raspbian boot partition
+#### (4) mount our new raspbian boot & root partitions
 after we have flashed the OS to our SD storage, we should now have a boot and root partition on our SD storage disk. we can verify this by again running `lsblk` and see some nested partitions,
 
 ``` shell
 $ lsblk
 NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
 sdd           8:48   1   3.7G  0 disk
+├─sdd1        8:49   1  41.8M  0 part
+└─sdd2        8:50   1   1.7G  0 part
 nvme0n1     259:0    0 953.9G  0 disk
 ├─nvme0n1p1 259:1    0     1G  0 part /boot
 ├─nvme0n1p2 259:2    0    20G  0 part /
 └─nvme0n1p3 259:3    0 429.5G  0 part /home
 ```
+cool, we now have `sdd1` (boot partition) and `sdd2` (root partition) as partitions of our `sdd` disk.
 
-now we want to mount this disk onto our computer's filesystem. i typically mount disks in the `/mnt/` directory. we can do this with
+lets verify that everything looks good by mounting each partition and checking them visually. mount this partitions onto our computer's filesystem using `mount`. i typically mount disks in the `/mnt/` directory. lets mount and look at the boot partition, it should look like this,
 
 ``` shell
-$ sudo mount /dev/sdd /mnt/usb1
+$ sudo mount /dev/sdd1 /mnt/usb1
+$ ls /mnt/usb1
+bcm2708-rpi-0-w.dtb     bcm2710-rpi-3-b.dtb       config.txt     fixup_x.dat       LICENSE.oracle  start_x.elf
+bcm2708-rpi-b.dtb       bcm2710-rpi-3-b-plus.dtb  COPYING.linux  issue.txt         overlays
+bcm2708-rpi-b-plus.dtb  bcm2710-rpi-cm3.dtb       fixup_cd.dat   kernel7.img       start_cd.elf
+bcm2708-rpi-cm.dtb      bootcode.bin              fixup.dat      kernel.img        start_db.elf
+bcm2709-rpi-2-b.dtb     cmdline.txt               fixup_db.dat   LICENCE.broadcom  start.elf
+$ sudo umount /mnt/usb1
 ```
+
+lets mount and look at the root partition, it should look like this,
+
+``` shell
+$ sudo mount /dev/sdd2 /mnt/usb1
+$ ls /mnt/usb1
+bin  boot  dev  etc  home  lib  lost+found  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+$ sudo umount /mnt/usb1
+```
+
 
 ## Resources
 [Official Raspbian Installation Guide](https://www.raspberrypi.org/documentation/installation/installing-images/README.md)
