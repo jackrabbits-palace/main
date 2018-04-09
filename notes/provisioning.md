@@ -56,13 +56,17 @@ $ sudo ufw default deny incoming
 $ sudo ufw default allow outgoing
 ```
 
-#### allow ssh, dns, www, tls, (optionally tor)
+#### allow ssh, dhcp, dns, mdns, www, tls, (optionally tor)
 
 ```
 $ sudo ufw allow in ssh  # 22/tcp for ssh
 $ sudo ufw allow out ssh
+$ sudo ufw allow in 68/udp # port for dhcp client
+$ sudo ufw allow out 68/udp
 $ sudo ufw allow in dns  # 53/tcp for dns
 $ sudo ufw allow out dns
+$ sudo ufw allow in mdns  # 5353/udp for multicast dns
+$ sudo ufw allow out mdns
 $ sudo ufw allow in www  # 80/tcp for standard http traffic
 $ sudo ufw allow out www
 $ sudo ufw allow in 443/tcp  # for serving tls certs
