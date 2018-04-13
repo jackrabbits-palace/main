@@ -1,0 +1,25 @@
+#+TITLE: JACKRABBITS PALACE TODO
+
+* TODO curl slime.church, see request in jp logs[3/4]
+** DONE jrp needs a static ip
+   - State "DONE"       from "IN PROGRESS" [2018-04-13 Fri 17:30]
+   - State "IN PROGRESS" from "TODO"       [2018-04-13 Fri 17:30]
+** DONE port forward incoming traffic from router -> jrp
+   - State "DONE"       from "IN PROGRESS" [2018-04-13 Fri 17:35]
+   - State "IN PROGRESS" from "TODO"       [2018-04-13 Fri 17:31]
+** DONE make hello world server (test it locally)
+   - State "DONE"       from "IN PROGRESS" [2018-04-13 Fri 17:50]
+   - State "IN PROGRESS" from "TODO"       [2018-04-13 Fri 17:50]
+** TODO setup ddclient on jrp to talk to dn registrars (namecheap)
+*** TODO talk to namecheap for s.c -> test w/ hello world
+*** TODO talk to namecheap for s.t -> test w/ hello world
+
+* TODO setup nginx reverse proxies [0/5]
+** TODO copy hello world page to s.c & s.t.
+** TODO test direct local hello world w/ s.c/s.t
+** TODO write nginx conf for s.c & s.t.
+** TODO test proxied local hello world s.c. & s.t
+** TODO test proxied remote hello world s.c. & s.t
+
+* TODO SSH Tunnel [/]
+** TODO  research wtf to do

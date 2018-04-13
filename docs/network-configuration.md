@@ -33,6 +33,11 @@ we need to learn a bit about our network before we do anything.
    $ ip -a addr show | grep global
    inet 192.168.66.145/24 brd 192.168.66.255 scope global wlan0
    ```
+   a nice programmatic way is to do this
+   ```shell
+   ip -a addr show | grep global | awk '{print $2}'
+   ```
+
 ### update dhcpcd.conf
 we need to now tell the dhcp server that we don't want a dynamic ip address, but we will be using a static one. we can do this by making some updates to the `/etc/dhcpcd.conf` file. this file is the configuration for the dhcp client daemon which runs on our pi and communicates with the dhcp server. Here are the changes we need to make to `/etc/dhcpcd.conf`:
 ```shell
@@ -51,6 +56,29 @@ in the changes above, we are using the info we gathered previously and mapped
 now we need to configure our router to port forward a port on the router's public ip to a port on our pi's static local network ip. to do this we need to login to our router's admin portal. go to your web browser and go to your router ip. In the previous step we found that the router (gateway) ip is `192.168.66.1`, so lets go there in our browser. You should be presented with the login screen for your router. Usually the username and password are both `admin` so you should probably change this to something more secure.
 
 this step will be highly depenedent on what router you have. generally, you want to find a way to configure port forwarding and then forward a port on the router's public ip to a port on your pi's static local ip address using all protocols.
+
+to test if this works, we can find the public ip address of our router and navigate in our browser (or curl),
+
+``` shell
+$ curl ipinfo.io/ip
+59.202.50.187
+```
+we can then curl this ip and see if it works
+
+``` shell
+$ curl  59.202.50.187
+<output of some server running on 80 on your box>
+```
+
+an example simple server could be setup as follows (but you do you):
+
+``` shell
+$ sudo su
+# cd /var/www
+# mkdir hello && cd hello
+# echo "hi there freindos!" > index.html
+# python3 -m http.server 80
+```
 
 # dynamic dns
 just like how, by default, a device connecting onto the local network is dynamically assigned an ip address by your router, your *router* is dynamically re-assigned an ip address by your internet service provider (ISP) quite frequently. if we want to be able to connect to our router from the outside world (via a domain name we own or something) without having to always re-lookup our router's exposed ip address, then we are going to have to stay up-to-date with what our router's ip address everytime it changes. *Dynamic DNS* (DDNS) to the rescue!
