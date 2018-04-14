@@ -1,0 +1,5 @@
+export DDNS_WEB=dynamicdns.park-your-domain.com/getip
+export DDNS_PROTOCOL=namecheap
+export DDNS_SERVER=dynamicdns.park-your-domain.com
+export DDNS_LOGIN=slime.church
+export DDNS_PASSWORD=lol

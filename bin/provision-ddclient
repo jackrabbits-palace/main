@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+sudo su
+
+#
+# INSTALL
+#
+
+DEBIAN_FRONTEND=noninteractive apt install ddclient -yq
+
+#
+# CONFIGURE
+#
+
+env_vars=read_env_vars ../.env/slime.church
+register_domain $env_vars
+
+read_env_vars(){
+  env_file=$1
+  env_vars=read_vars env_file
+}
+
+read_vars(){
+  
+}
+
+register_domain(){
+  vars=$1 # arra
+  substitute_vars vars template_conf domain_conf
+  cat domain_conf >> /etc/ddclient.conf
+}
+
+substitute_vars(){
+  
+}
+
+mv ../conf/ddclient.conf /etc/ddclient.conf
