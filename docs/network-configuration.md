@@ -95,9 +95,8 @@ here is a [useful blog post](https://blog.dembowski.net/2013/namecheap-dynamic-d
 3. still on namecheap, there should be an option to enable ddns, which you should do and then it will give you a long Dynamic DNS Password.
 4. on your pi, install the `ddclient`
    ```shell
-   $ sudo apt-get install ddclient
+   $ sudo DEBIAN_FRONTEND=noninteractive apt install ddclient -yq
    ```
-   you should be prompted to answer some questions, but it doesn't matter cuz you'll be editing the configuration anyway.
 5. now edit the `/etc/ddclient.conf` on your pi to look something like
    ```shell
    # /etc/ddclient.conf
@@ -111,20 +110,17 @@ here is a [useful blog post](https://blog.dembowski.net/2013/namecheap-dynamic-d
    server=dynamicdns.park-your-domain.com
    login=slime.church
    password='your namecheap ddns password'
-   @
+   @.slime.church
    ```
-6. remove the cache of the original config asked for by the prompt
-   ```shell
-   $ sudo rm /var/cache/ddclient/ddclient.cache
-   ```
-7. restart ddclient
+6. restart ddclient
    ```shell
    $ sudo ddclient
    ```
-8. configure `ddclient` to run as a daemon, open `/etc/default/ddclient`
+7. configure `ddclient` to run as a daemon, open `/etc/default/ddclient`
    ```shell
+   run_ipup="false
    run_daemon="true"
    ```
-9. start the ddclient daemon, `sudo service ddclient start`
+8. start the ddclient daemon, `sudo service ddclient start`
 
 this is another [good blog post](https://samhobbs.co.uk/2015/01/dynamic-dns-ddclient-raspberry-pi-and-ubuntu) which says something at the end about dynamic dns providers timing out if there are no updates in a while, but i won't worry about that for now.
