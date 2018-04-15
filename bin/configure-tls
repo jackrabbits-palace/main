@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+#
+# setup
+#
+pushd `pwd`  # push current path to stack
+cd `dirname "$0"` # cd to script path
+./check-dependencies "openssl certbot" || exit $?  # ensure we got certbot
+./check-root || exit $? # enforce root
+
+#
+# script
+#
+
+echo "---- setting strong diffie helman params"
+# see: https://weakdh.org/
+dh_param_path=/etc/ssl/certs/dhparam.pem
+if [ ! -e "$dh_param_path" ]
+then
+  openssl dhparam -out $dh_param_path 2048
+else
+  echo "---- found strong diffie helman params in ${dh_param_path}"
+fi
+
+
+# TODO (cw, ag|4.16.2018)
+# - these configs should be slurped up from some file
+#   rather than being hard-coded right here.
+# - *ALSO* if we don't want to expose out email addresses
+#    we could encrypt that config file using blackbox! ^-^
+
+declare -a domains=("jackrabbitspal.us" \
+                      "serious.town" \
+                      "slime.church" \
+                      "deep.slime.church" \
+                   )
+
+declare -a emails=("j4ckr4bb1t@riseup.net" \
+                     "aguestuser@riseup.net" \
+                     "c@polygon.pizza" \
+                     "c@polygon.pizza" \
+                  )
+
+for i in ${!domains[@]}
+do
+  # TODO (cw, ag|4.16.2018)
+  # - this config can be Logjammed (FREAk attack reminiscences anyone?)
+  # - as a result we get a B! fuck that!
+  # - see, a B: https://www.ssllabs.com/ssltest/analyze.html?d=jackrabbitspal.us
+  # - certbot is supposed to have fixed this: https://github.com/certbot/certbot/issues/4753
+  # - but they haven't, or something....
+  # - LOGJAM-O-RAMA!!!!! https://weakdh.org/
+
+  echo "---- configuring certs for ${domains[i]} with email address ${emails[i]}"
+  certbot \
+    --non-interactive \
+    --agree-tos \
+    --authenticator standalone \
+    --installer nginx \
+    --email ${emails[i]} \
+    --domains ${domains[i]} \
+    --rsa-key-size 4096 \
+    --pre-hook "systemctl stop nginx" \
+    --post-hook "systemctl start nginx"
+  # write the dh_param thingie if it doesn't already exist
+
+done
+
+echo "---- configuring autorenewal for all domainsn"
+systemctl enable certbot.timer
+systemctl start certbot.timer
+
+echo "+++++ succesfully configured yr certs, friendo! \o/"
+
+#
+# cleanup
+#
+popd
+  

@@ -7,8 +7,14 @@ cd `dirname "$0"` # cd to script path
 
 echo "----- installing apt packages..."
 
-DEBIAN_FRONTEND=noninteractive apt install -yq \
- git nginx ddclient dhcpcd5 ufw dirmngr
+DEBIAN_FRONTEND=noninteractive apt install -yq\
+ git\
+ nginx\
+ ddclient\
+ dhcpcd5\
+ ufw\
+ dirmngr\
+ python-certbot-nginx
 
 echo "----- installing blackbox scripts to /usr/bin"
 
