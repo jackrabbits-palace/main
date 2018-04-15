@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+echo '+++++ begining set-hostname'
+
+echo '----- obtaining root'
+sudo su
+
+old_hostname=`cat /etc/hostname`
+new_hostname=$1
+
+echo '----- setting new hostname in /etc/hostname'
+echo $new_hostname > /etc/hostname
+
+echo '----- setting new hostname in /etc/hosts'
+sed -i "s/${old_hostname}/${new_hostname}/g" /etc/hosts
+
+echo '+++++ completed set-hostname, REBOOTING'
+reboot
