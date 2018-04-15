@@ -8,9 +8,34 @@ according to some resources, here are the general steps:
 
 *for most of these steps, i am assuming we are running at least raspbian stretch.*
 
-# assign static ip address to your pi
+# Note on topology
+
+If you are running more than one server on your local network, then you will need one public-facing server through which all traffic for other servers is proxied. We will call this the "bastion server."
+
+The bastion server needs to have a static IP so that the router can always find it and send it traffic intended for services sitting behind it.
+
+If you only have one machine on the network, then your bastion server *is* your application server. Follow all of the steps below for it!
+
+If you have one bastion server and many application servers, then you only *need* to configure a static IP for the bastion server. (But feel welcome to configure a static IP for your application servers as well!) You should *not* follow the port forwarding instructions for every machine, but *only* for the machine you intend to run as your bastion server.
+
+**Uphshot:* if you are configuring the only server on your network, or the bastion server on a multi-server network, do steps 1, 2, and 3 below. If you are configuring an application server on a multi-server network, you *may* do step 1, should *not* do step 2, and *must* do step  3.
+
+Have fun! :P
+
+# 1. assign static ip address to your bastion server
+
 the raspberry pi defaults to using a dynamic IP address assigned by the DHCP server (most likely your network router). we want to set it to be static instead.
-### network information
+
+if you would like to have a script do this for you, try this on for size:
+
+``` shell
+$ cd path/to/jackrabbits-palace
+$ ./bin/configure-static-ip
+```
+
+else, here are the steps for doing it manually:
+
+### gather network information
 we need to learn a bit about our network before we do anything.
 
 1. get the **default gateway ip**. this is the local ip address of our router. all connected devices talk to this in order to access the internet or other devices connected on the local network.
@@ -51,20 +76,27 @@ we need to learn a bit about our network before we do anything.
    ```
 
 ### update dhcpcd.conf
+
 we need to now tell the dhcp server that we don't want a dynamic ip address, but we will be using a static one. we can do this by making some updates to the `/etc/dhcpcd.conf` file. this file is the configuration for the dhcp client daemon which runs on our pi and communicates with the dhcp server. Here are the changes we need to make to `/etc/dhcpcd.conf`:
+
 ```shell
 interface wlan0
 static ip_address=192.168.66.145/24
 static routers=192.168.66.1
 static domain_name_servers=192.168.66.1
 ```
+
 in the changes above, we are using the info we gathered previously and mapped
 * *ip_address* <--> *local ip*
 * *routers* <--> *gateway ip*
 * *domain_name_servers* <--> *DNS server ip*
 
 ### reboot your pi
-# update router config to port forward inbound trafic to pi
+
+this is the easiest way to reload the network configurations we have just changed
+
+# 2. update router config to port forward inbound trafic to pi
+
 now we need to configure our router to port forward a port on the router's public ip to a port on our pi's static local network ip. to do this we need to login to our router's admin portal. go to your web browser and go to your router ip. In the previous step we found that the router (gateway) ip is `192.168.66.1`, so lets go there in our browser. You should be presented with the login screen for your router. Usually the username and password are both `admin` so you should probably change this to something more secure.
 
 this step will be highly depenedent on what router you have. generally, you want to find a way to configure port forwarding and then forward a port on the router's public ip to a port on your pi's static local ip address using all protocols.
@@ -92,8 +124,10 @@ $ sudo su
 # python3 -m http.server 80
 ```
 
-# dynamic dns
+# 3. dynamic dns
+
 just like how, by default, a device connecting onto the local network is dynamically assigned an ip address by your router, your *router* is dynamically re-assigned an ip address by your internet service provider (ISP) quite frequently. if we want to be able to connect to our router from the outside world (via a domain name we own or something) without having to always re-lookup our router's exposed ip address, then we are going to have to stay up-to-date with what our router's ip address everytime it changes. *Dynamic DNS* (DDNS) to the rescue!
+
 ### what is DDNS?
 its basically an approach for your local computer to broadcast changes to its router's public ip address to some external service which wants to keep up-to-date with your ip address. There are a couple ways of going about this,
 1. **your router has a DDNS client built into it**: your router detects when its public ip changes and then broadcasts this to a service which wants to know. the services that a router can broadcast to might be limited so, for example, if you have a domain registered with namecheap and your router doesn't broadcast to the namecheap ddns service, then you are out of luck.
