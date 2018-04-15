@@ -1,25 +1,34 @@
 #!/usr/bin/env bash
 
 # throat-clearing
-pushd `pwd`
-sudo su
+sudo su &
 
 echo "----- discovering LAN ip addresses"
 
 self_ip=`ip -a addr show | grep global | awk '{print $2}'`
 echo "self_ip=${self_ip}"
+
 gateway_ip=`netstat -nr | sed -n 3p | awk '{print $2}'`
 echo "gateway_ip=${gateway_ip}"
+
 nameserver_ip=`grep nameserver /etc/resolv.conf | awk '{print $2}'`
 echo "nameserver_ip=${nameserver_ip}"
 
-
 echo "----- writing LAN ip addresses to /etc/dhcpd.conf"
 
-rm /etc/dhcpd.conf
-cat "interface wlan0" >> /etc/dhcpd.conf
-cat "static ip_address=${self_ip}" >> /etc/dhcpd.conf
-cat "static routers=${gateway_ip}"  >> /etc/dhcpd.conf
-cat "static domain_name_servers=${nameserver_ip}" >> /etc/dhcpd.conf
+if [ -e /etc/dhcpd.conf ]; then rm /etc/dhcpd.conf; fi
+touch /etc/dhcpd.conf
 
-echo "----- DONE, rebooting to reset network settings"
+echo "interface wlan0" >> /etc/dhcpd.conf
+echo "static ip_address=${self_ip}" >> /etc/dhcpd.conf
+echo "static routers=${gateway_ip}"  >> /etc/dhcpd.conf
+echo "static domain_name_servers=${nameserver_ip}" >> /etc/dhcpd.conf
+
+echo "----- new contents of /etc/dhcpd.conf:"
+cat /etc/dhcpd.conf
+
+echo "++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "++  DONE, rebooting to reset network settings ++"
+echo "++++++++++++++++++++++++++++++++++++++++++++++++"
+
+reboot
