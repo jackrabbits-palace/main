@@ -1,0 +1,31 @@
+# SETUP
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./check-root || exit $? # enforce root
+
+$domain=$1
+$conf=/etc/nginx/conf.d/default.conf
+source ../.env/${domain}
+
+echo "" >> $conf
+echo "##########################################" >> $conf
+echo "## START configuration for serious.town ##" >> $conf
+echo "server {" >> $conf
+echo "   listen      80;" >> $conf
+echo "   server_name ${WAN_HOSTNAME};" >> $conf
+echo "   access_log  /var/log/nginx/${WAN_HOSTNAME}.access.log  combined;" >> $conf
+echo "   error_log   /var/log/nginx/${WAN_HOSTNAME}.error.log;" >> $conf
+echo "" >> $conf
+echo "   location / {" >> $conf
+echo "       proxy_pass  http://${LOCAL_HOSTNAME}.local;" >> $conf
+echo "       proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;" >> $conf
+echo "       proxy_redirect off;" >> $conf
+echo "       proxy_buffering off;" >> $conf
+echo "       proxy_set_header        Host            ${WAN_HOSTNAME};" >> $conf
+echo "       proxy_set_header        X-Real-IP       $remote_addr;" >> $conf
+echo "       proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;" >> $conf
+echo "    }" >> $conf
+echo "" >> $conf
+echo "}" >> $conf
+echo "## START configuration for ${WAN_HOSTNAME} ##" >> $conf
+echo "##########################################" >> $conf
