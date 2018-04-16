@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# setup
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./check-root || exit $? # enforce root
+
+echo "----- installing dependencies..."
+
+DEBIAN_FRONTEND=noninteractive apt install -yq \
+ git nginx ddclient dhcpcd5
+
+echo "----- successfully installed dependencies"
+
+# cleanup
+popd
