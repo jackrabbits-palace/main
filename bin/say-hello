@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# SETUP
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./check-root || exit $? # enforce root
+
+# MAKE SERVER
+
+if [ ! -e /var/www/hello ]
+then
+  mkdir /var/www/hello
+  echo "hi there friendos!" > /var/www/hello/index.html
+fi
+
+cd /var/www/hello
+python3 -m http.server 80
+
+# CLEANUP
+popd
