@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
-# throat-clearing
-sudo su &
+
+# setup
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./check-root || exit $? # enforce root
+
+# script
 
 echo "----- discovering LAN ip addresses"
 
@@ -16,16 +21,24 @@ echo "nameserver_ip=${nameserver_ip}"
 
 echo "----- writing LAN ip addresses to /etc/dhcpd.conf"
 
-if [ -e /etc/dhcpd.conf ]; then rm /etc/dhcpd.conf; fi
-touch /etc/dhcpd.conf
+if [ ! -e /etc/dhcpcd.conf ]
+then
+  echo "[OOPS]: you don't have dhcpcd! try running ./bin/install-dependencies"
+  exit 1
+fi
 
-echo "interface wlan0" >> /etc/dhcpd.conf
-echo "static ip_address=${self_ip}" >> /etc/dhcpd.conf
-echo "static routers=${gateway_ip}"  >> /etc/dhcpd.conf
-echo "static domain_name_servers=${nameserver_ip}" >> /etc/dhcpd.conf
+echo "" >> /etc/dhcpcd.conf
+echo "######################################" >> /etc/dhcpcd.conf
+echo "# static ip for ${HOSTNAME}.local " >> /etc/dhcpcd.conf
+echo "######################################" >> /etc/dhcpcd.conf
+echo "" >> /etc/dhcpcd.conf
+echo "interface wlan0" >> /etc/dhcpcd.conf
+echo "static ip_address=${self_ip}" >> /etc/dhcpcd.conf
+echo "static routers=${gateway_ip}"  >> /etc/dhcpcd.conf
+echo "static domain_name_servers=${nameserver_ip}" >> /etc/dhcpcd.conf
 
-echo "----- new contents of /etc/dhcpd.conf:"
-cat /etc/dhcpd.conf
+echo "----- new contents of /etc/dhcpcd.conf:"
+cat /etc/dhcpcd.conf
 
 echo "++++++++++++++++++++++++++++++++++++++++++++++++"
 echo "++  DONE, rebooting to reset network settings ++"
