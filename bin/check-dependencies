@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+dependencies=$1
+
+for dependency in $dependencies
+do
+  if [ -z `which ${dependency}` ]
+  then
+    echo "[OOPS]: Command ${dependency} not found. Try running ./bin/install-dependencies"
+    exit 1
+  fi
+done

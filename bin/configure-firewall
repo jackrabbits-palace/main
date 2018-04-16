@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+#
+# setup
+#
+
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./check-root || exit $? # enforce root
+./check-dependencies "ufw" || exit $? # 
+
+#
+# script
+#
+
+echo "----- setting baseline config"
+ufw default deny incoming
+ufw default allow outgoing
+
+echo "----- setting ssh configs"
+ufw allow in ssh  # 22/tcp for ssh
+ufw allow out ssh
+
+echo "----- setting http configs"
+ufw allow in www  # 80/tcp for standard http traffic
+ufw allow out www
+ufw allow in 443/tcp  # for serving tls certs
+ufw allow out 443/tcp
+
+echo "----- setting dns/dhcp configs"
+ufw allow in 68/udp # port for dhcp client
+ufw allow out 68/udp
+ufw allow in dns  # 53/tcp for dns
+ufw allow out dns
+ufw allow in mdns  # 5353/udp for multicast dns
+ufw allow out mdns
+
+echo "----- setting tor configs"
+ufw allow in 9050/tcp  # for tor proxy port (all traffic through the tor network starts here)
+ufw allow out 9050/tcp
+ufw allow in 9051/tcp  # for tor control port (any tor controlling application talks to tor through this listening port (note, it is unclear whether this ports needs to be exposed though))
+ufw allow out 9051/tcp
+
+echo "----- turning on firewall"
+echo "y" | ufw enable
+
+echo "----- firewall enabled with following rules:"
+ufw status verbose
+
+#
+# cleanup
+#
+
+popd

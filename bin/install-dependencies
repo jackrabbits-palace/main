@@ -8,7 +8,7 @@ cd `dirname "$0"` # cd to script path
 echo "----- installing dependencies..."
 
 DEBIAN_FRONTEND=noninteractive apt install -yq \
- git nginx ddclient dhcpcd5
+ git nginx ddclient dhcpcd5 ufw
 
 echo "----- successfully installed dependencies"
 
