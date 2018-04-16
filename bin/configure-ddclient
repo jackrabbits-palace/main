@@ -1,37 +1,58 @@
 #!/usr/bin/env bash
 
-sudo su
+# USAGE (for a tld, eg: "slime.church"):
+# $ ./bin/configure-ddclient slime.church
 
-#
-# INSTALL
-#
+# SETUP
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./check-root || exit $? # enforce root
 
-DEBIAN_FRONTEND=noninteractive apt install ddclient -yq
+# TODO: (aguestuser|16 Apr 2018)
+# extract this to yaml, so we can configure many hostnames
+$remote_hostname=$1
 
-#
 # CONFIGURE
-#
 
-env_vars=read_env_vars ../.env/slime.church
-register_domain $env_vars
+source ../.env/${remote_hostname}
 
-read_env_vars(){
-  env_file=$1
-  env_vars=read_vars env_file
-}
+if [ -e /var/cache/ddclient/ddclient.cache ]
+then
+  echo "----- claring cache in /var/cache/ddclient/ddclient.cache"
+  rm /var/cache/ddclient/ddclient.cache
+fi
 
-read_vars(){
-  
-}
+echo "----- adding configuration for ${remote_hostname} to /etc/ddclient.conf"
 
-register_domain(){
-  vars=$1 # arra
-  substitute_vars vars template_conf domain_conf
-  cat domain_conf >> /etc/ddclient.conf
-}
+echo "" >> /etc/ddclient.conf
+echo "######################################" >> /etc/ddclient.conf
+echo "# config for ${remote_hostname}" >> /etc/ddclient.conf
+echo "######################################" >> /etc/ddclient.conf
+echo "" >> /etc/ddclient.conf
+echo "use=web, web=${DDNS_WEB}" >> /etc/ddclient.conf
+echo "ssl=yes" >> /etc/ddclient.conf
+echo "protocol=${DDNS_PROTOCOL}" >> /etc/ddclient.conf
+echo "server=${DDNS_SERVER}" >> /etc/ddclient.conf
+echo "login=${DDNS_LOGIN}" >> /etc/ddclient.conf
+echo "password=${DDNS_PASSWORD}" >> /etc/ddclient.conf
+echo "@.${remote_hostname}" >> /etc/ddclient.conf
 
-substitute_vars(){
-  
-}
+echo "----- publishing new IP to remote nameserver"
 
-mv ../conf/ddclient.conf /etc/ddclient.conf
+ddclient
+
+echo "----- configuring ddclient to run as daemon"
+
+# *don't* run ddclient every time a new ppp connection is established
+sed -i "s/run_ipup=\"true\"/run_ipup=\"false\"/g"  /etc/default/ddclient
+# *do* run ddclient as a daemon
+sed -i "s/run_daemon=\"false\"/run_ipup=\"true\"/g"  /etc/default/ddclient
+
+echo "----- restarting ddclient"
+
+systemctl restart ddclient
+
+echo "+++++ ddclient configured! check your nameserver for new IP!"
+
+# CLEANUP
+popd
