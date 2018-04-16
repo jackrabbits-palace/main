@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+cat ~/.ssh/id_${HOSTNAME}_${USER} | awk '{print $2}' | base64 -d | md5sum
