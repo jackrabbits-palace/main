@@ -5,8 +5,8 @@
 #
 pushd `pwd`  # push current path to stack
 cd `dirname "$0"` # cd to script path
-./check-dependencies "openssl certbot" || exit $?  # ensure we got certbot
-./check-root || exit $? # enforce root
+../common/check-dependencies "openssl certbot" || exit $?  # ensure we got certbot
+../common/check-root || exit $? # enforce root
 
 #
 # script

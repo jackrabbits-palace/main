@@ -3,7 +3,7 @@
 echo '+++++ begining set-hostname'
 
 echo '----- obtaining root'
-sudo su
+./check-root || exit $?
 
 old_hostname=`cat /etc/hostname`
 new_hostname=$1
