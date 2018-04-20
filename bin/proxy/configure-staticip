@@ -4,7 +4,7 @@
 # setup
 pushd `pwd` # save original path
 cd `dirname "$0"` # cd to script path
-../common/check-root || exit $? # enforce root
+./common/check-root || exit $? # enforce root
 
 # script
 

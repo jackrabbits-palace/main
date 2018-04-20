@@ -6,7 +6,7 @@
 # SETUP
 pushd `pwd` # save original path
 cd `dirname "$0"` # cd to script path
-../common/check-root || exit $? # enforce root
+./common/check-root || exit $? # enforce root
 
 # TODO: (aguestuser|16 Apr 2018)
 # extract this to yaml, so we can configure many hostnames
