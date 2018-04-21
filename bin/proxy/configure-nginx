@@ -1,8 +1,15 @@
-# SETUP
+#!/usr/bin/env bash
+
+#
+# setup
+#
 pushd `pwd` # save original path
 cd `dirname "$0"` # cd to script path
 ./common/check-root || exit $? # enforce root
 
+#
+# script
+#
 $domain=$1
 $conf=/etc/nginx/conf.d/default.conf
 source ../.env/${domain}
@@ -29,3 +36,8 @@ echo "" >> $conf
 echo "}" >> $conf
 echo "## START configuration for ${WAN_HOSTNAME} ##" >> $conf
 echo "##########################################" >> $conf
+
+#
+# cleanup
+#
+popd

@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # setup
 pushd `pwd` # save original path
 cd `dirname "$0"` # cd to script path
