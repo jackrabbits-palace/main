@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# 
+# {
+#   [serious.town]: 221,
+#   [slime.church]: 222
+# }
+if [ $HOSTNAME == 'serioustown' ]
+then
+  remote_forwarding_port=221
+elif [ $HOSTNAME == 'slimechurch' ]
+then
+  remote_forwarding_port=222
+fi
+
+ssh -N -R ${remote_forwarding_port}:localhost:22 jackrabbits-palace.local
