@@ -4,9 +4,9 @@ dependencies=$1
 
 for dependency in $dependencies
 do
-  if [ -z `which ${dependency}` ]
+  if [ -z `dpkg --list | grep ${dependency} | sed -n 1p | awk '{print $2}'` ]
   then
-    echo "[OOPS]: Command ${dependency} not found. Try running ./bin/install-dependencies"
+    echo "[OOPS]: Command ${dependency} not found. Try running ./install-dependencies"
     exit 1
   fi
 done
