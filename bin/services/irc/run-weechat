@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+########################
+########################
+######### STUB #########
+########################
+########################
+
+#
+# setup
+#
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./common/check-dependencies "weechat weechat-plugins gnutls gpm python-potr openssl" || exit $? # 
+
+
+#
+# script
+#
+
+# TODO
+# - read nicks & credentails for all servers
+# - start weechat w/ commands to identify with all servers
+
+#
+# cleanup
+#
+popd

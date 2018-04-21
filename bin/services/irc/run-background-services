@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+#
+# setup
+#
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./common/check-root || exit $? # enforce root
+./common/check-dependencies "gpm" || exit $?
+#
+# script
+#
+echo "----- running background services..."
+systemctl start gpm
+
+#
+# cleanup
+#
+popd
