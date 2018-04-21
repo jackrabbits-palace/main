@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+#
+# setup
+#
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./common/check-root || exit $? # enforce root
+
+#
+# script
+#
+echo "----- installing apt packages..."
+
+DEBIAN_FRONTEND=noninteractive apt install -yq\
+ gpm \
+ openssl \
+ python-potr \
+ tmux \
+ tor \
+ weechat \
+ weechat-plugins
+
+#
+# cleanup
+#
+popd
