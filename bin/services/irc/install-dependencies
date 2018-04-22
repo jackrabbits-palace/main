@@ -10,7 +10,7 @@ cd `dirname "$0"` # cd to script path
 #
 # script
 #
-echo "----- installing apt packages..."
+echo "----- installing apt packages"
 
 DEBIAN_FRONTEND=noninteractive apt install -yq\
  gpm \
@@ -20,6 +20,11 @@ DEBIAN_FRONTEND=noninteractive apt install -yq\
  tor \
  weechat \
  weechat-plugins
+
+echo "----- running background services..."
+./common/run-background-services "gpm"
+
+echo "----- successfully installed dependencies"
 
 #
 # cleanup

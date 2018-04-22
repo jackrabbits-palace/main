@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+#
+# setup
+#
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./check-root || exit $? # enforce root
+
+#
+# script
+#
+
+services=$1
+
+for service in $services
+do
+  "----- running service ${service}"
+  ./check-dependencies $service || exit $?
+  systemctl enable $service
+  systemctl start $service
+done
+
+#
+# cleanup
+#
+popd

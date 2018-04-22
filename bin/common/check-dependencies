@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 
 dependencies=$1
-
+if [ -z "$dependencies" ]
+then
+  # TODO: (ag|21 Apr 2018)
+  # - we should list these in a file and have a single source of truth
+  #   for both `install-dependencies` and `check-dependencies`
+  dependencies="build-essential dirmngr nginx python python-pip shyaml ufw"
+fi
 for dependency in $dependencies
 do
-  if [ -z `dpkg --list | grep ${dependency} | sed -n 1p | awk '{print $2}'` ]
+  if [ -z `which ${dependency} || dpkg --list | grep ${dependency} | sed -n 1p | awk '{print $2}'` ]
   then
     echo "[OOPS]: Command ${dependency} not found. Try running ./install-dependencies"
     exit 1

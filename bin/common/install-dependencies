@@ -3,24 +3,34 @@
 # setup
 pushd `pwd` # save original path
 cd `dirname "$0"` # cd to script path
-./common/check-root || exit $? # enforce root
+./check-root || exit $? # enforce root
 
-echo "----- installing apt packages..."
+echo "----- updating package repository listings"
+apt update
 
-DEBIAN_FRONTEND=noninteractive apt install -yq\
- git\
- nginx\
- ufw\
- dirmngr
+echo "----- updgrading existing packages"
+DEBIAN_FRONTEND=noninteractive apt upgrade -yq
 
-echo "----- installing blackbox scripts to /usr/bin"
+echo "----- installing required packages"
+DEBIAN_FRONTEND=noninteractive apt install -yq \
+ build-essential \
+ dirmngr \
+ nginx \
+ python \
+ python-pip \
+ ufw
 
-# TODO: (aguestuser|Mon 16 Apr 2018)
-# only do this if we don't have blackbox. how to check? exercise left for reader...
-git clone https://github.com/StackExchange/blackbox.git
-cd blackbox
-make copy-install
-cd ../ && rm -rf blackbox
+echo "----- installing python packages"
+pip install shyaml
+
+if [-z `which blackbox_edit` ]
+then
+  echo "----- installing blackbox scripts to /usr/bin"
+  git clone https://github.com/StackExchange/blackbox.git
+  cd blackbox
+  make copy-install
+  cd ../ && rm -rf blackbox
+fi
 
 echo "----- successfully installed dependencies"
 

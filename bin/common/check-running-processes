@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+processes=$1
+
+for process in $processes
+do
+  echo "----- checking for running process ${process}"
+  # we check for existence of a 3rd line b/c this script will include process name twice:
+  # - once for invocation of command itself (to which process name is argument)
+  # - once for invocation of grep with process name as arg
+  pid=`ps aux | grep ${process} | sed -n 4p | awk '{print $2}'`
+  if [ $pid ]
+  then
+    echo "----- found running process w/ PID: ${pid}"
+  else
+    echo "[OOPS]: ${process} is not running. Try running systemctl start ${process}"
+    exit 1
+  fi
+done
