@@ -2,3 +2,4 @@
 /keyrings/live/pubring.kbx~
 /keyrings/live/secring.gpg
 /.env/serious.town
+/bin/services/irc/conf.yaml

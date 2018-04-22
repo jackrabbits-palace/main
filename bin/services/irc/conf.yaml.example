@@ -1,0 +1,10 @@
+# TODO: extract host and port from domain
+# USAGE: copy this to `conf.yaml`
+username: friendo
+servers:
+  freenode:
+    domain: freenodeok2gncmy.onion
+    ssl: false
+  oftc:
+    domain: irc.oftc.net/6697
+    ssl: true
