@@ -1,0 +1,19 @@
+#########
+# setup #
+#########
+
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./common/check-dependencies "shyaml weechat weechat-plugins openssl gpm python-potr" || exit $?
+
+##########
+# script #
+##########
+
+./configure-servers
+./configure-certs
+
+###########
+# cleanup #
+###########
+popd
