@@ -18,18 +18,18 @@ weechat -r "/proxy add tor socks5 127.0.0.1 9050;/quit"
 
 echo "----- enabling otr..."
 
-weechat -r "/script install otr.py;/wait 500ms /quit"
+weechat -r "/script install otr.py;/wait 500ms;/quit"
 
 echo "----- disabling logs..."
 
-weechat -r "/set logger.level.irc 0; /quit"
+weechat -r "/set logger.level.irc 0;/quit"
 
 echo "----- enabling ui niceties..."
 
 cmd="/mouse enable;" # click on buffers!
 cmd="${cmd}/filter add irc_smart * irc_smart_filter *;" # filter out join/leave mgs
 cmd="${cmd}/script install buffers.pl;/wait 500ms;" # show buffers list in left aside
-weechat -r "${cmd};/quit"
+weechat -r "${cmd}/quit"
 
 echo "----- configuring irc servers..."
 
