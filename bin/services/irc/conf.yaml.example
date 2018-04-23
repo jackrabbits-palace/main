@@ -1,12 +1,19 @@
-# TODO: extract host and port from domain
-# USAGE: copy this to `conf.yaml`
+# USAGE:
+# - copy this to `conf.yaml`
+# - fill in placeholder username/email/password with real values
+
 username: friendo
+email: friendo@example.com
 servers:
   freenode:
-    domain: freenodeok2gncmy.onion
-    ssl: false
-    password: l0l
+    domain: chat.freenode.net/6697
+    password: somepassword
+  indymedia:
+    domain: irc.indymedia.org/6697
+    password: somepassword
+  autistici:
+    domain: irc.autistici.org/6697
+    password: somepassword
   oftc:
     domain: irc.oftc.net/6697
-    ssl: true
-    password: t3h3
+    password: somepassword
