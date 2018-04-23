@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+
+#########
+# usage #
+#########
+
+# presupposes you have already 
+# 1. run /configure-init
+# 2. verified your nick with each server by responding to
+#    the confirmation email generated in (1)
+
+
+#########
+# setup #
+#########
+
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./common/check-dependencies "shyaml weechat openssl" || exit $?
+source ./util
+
+##########
+# script #
+##########
+
+servers=`cat conf.yaml | shyaml keys servers`
+username=`cat conf.yaml | shyaml get-value username`
+email=`cat conf.yaml | shyaml get-value email`
+
+for server in $servers
+do
+  echo "----- configuring certs for ${server}"
+
+  # retrieve static configs
+  domain=`get-srv-cfg ${server} domain`
+  password=`get-srv-cfg ${server} password`
+
+  echo "---------- generating certs for ${server}"
+  # generate cert
+    openssl req \
+          -x509 \
+          -sha256 \
+          -new \
+          -newkey rsa:4096 \
+          -days 1000 \
+          -nodes \
+          -out ${server}.pem \
+          -keyout ${server}.pem \
+          -subj "/C=AC/ST=AB/L=ACAB/O=ACAB/OU=ACAB/CN=ACAB" # to silence input prompt
+  fingerprint=`openssl x509 -in ${server}.pem -outform der | sha1sum -b | cut -d' ' -f1`
+  mkdir -p ~/.weechat/certs
+  mv ${server}.pem ~/.weechat/certs
+
+  echo "---------- registering certs with ${server}"
+
+  # NOTE: (aguestuser)
+  # - freenode and OFTC only allow users to connect over tor via TLS SASL (fine)
+  # - but they require you to *FIRST* register TLS cert via a clearnet connection
+  #   authentcicated with basic authe (ie: username/password)
+  # - :. we *FIRST* create the cert for these two servers over clearnet connection 
+  #   using same steps as all other servers (which happen to be connected over tor)
+  # - *THEN* we configure freenode and OFTC for tor and reconnect via TLS SASL
+  #   (which now is allowed over tor b/c we have already authed the certs via clearnet/basic auth)
+  # - in the case of freenode, we must also change the address of the service to an onion
+  #   address (since they only tor connections to this address) before reconnecting over tor
+
+  # SAD TODO (aguestuser|23 Apr 2018):
+  # - try as i might, i simply cannot get this script to reliably work for freenode and OFTC
+  #   although all the steps work when performed manually (VERY frustrating)
+  # - clue: i *think* it has something to do with timing. it is posisble that issuing the command
+  #   to register the cert does not have time to complete before the command to reconnect via
+  #   tor is issued. i have experimented with issuing `/wait Nms` commands, but they don't actually
+  #   seem to cause the script to pause. =(
+  # - as a workaround, i have disabled the script for freenode, AND you can run all of the 
+  #   steps listed below manually (referenced in configure-certs-manually.md) and it will work
+  # - left as TODO to figure out why this is necessary. :mega-sad-face:
+  
+  # REFERENCES:
+  # - https://freenode.net/news/tor-online
+  # - https://szorfein.github.io/weechat/tor/configure-weechat/
+
+  if [ $server != 'freenode' ] && [ $server != 'oftc' ]
+  then
+    # auth w/ password
+    cmd="${cmd}/connect ${server};"
+    cmd="${cmd}/buffer ${server};"
+    cmd="${cmd}/msg nickserv identify ${password};"
+
+    # register cert w/ nickserv
+    cmd="${cmd}/msg nickserv cert add ${fingerprint};"
+
+    # configure SASL w/ TLS cert
+    cmd="${cmd}/set irc.server.${server}.ssl_cert %h/certs/${server}.pem;"
+    cmd="${cmd}/set irc.server.${server}.sasl_mechanism external;"
+    sasl_priorites="'NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:%COMPAT'"
+    cmd="/set irc.server.${server}.ssl_priorities ${sasl_priorities};"
+
+    # enable tor connection to freenode
+    if [ $server == 'freenode' ]
+    then
+      cmd="${cmd}/set irc.server.freenode.addresses 'freenodeok2gncmy.onion/7000';"
+      cmd="${cmd}/set irc.server.freenode.ssl on;"
+      cmd="${cmd}/set irc.server.freenode.ssl_verify off;"
+    fi
+
+    # ensure all servers configured for tor and reconnect
+    cmd="${cmd}/set irc.server.${server}.proxy 'tor';"
+    cmd="${cmd}/reconnect ${server};"
+    
+    # run it!!!
+    weechat -r "${cmd}/quit"
+  fi
+done  
+
+###########
+# cleanup #
+###########
+popd

@@ -1,0 +1,7 @@
+get-srv-cfg(){
+  server=$1; config=$2
+  cat conf.yaml |
+    shyaml get-value "servers.${server}.${config}" |
+    sed "s/True/-${config}/g" |
+    sed "s/False//g"
+}

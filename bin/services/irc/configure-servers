@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+#
+# setup
+#
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./common/check-dependencies "shyaml weechat weechat-plugins gpm python-potr" || exit $?
+./common/check-running-processes "gpm" || exit $?
+source ./util #imports `get-srv-cfg`
+
+#
+# script
+#
+echo "----- enabling tor..."
+
+weechat -r "/proxy add tor socks5 127.0.0.1 9050;/quit"
+
+echo "----- enabling otr..."
+
+weechat -r "/script install otr.py;/wait 500ms /quit"
+
+echo "----- disabling logs..."
+
+weechat -r "/set logger.level.irc 0; /quit"
+
+echo "----- enabling ui niceties..."
+
+cmd="/mouse enable;" # click on buffers!
+cmd="${cmd}/filter add irc_smart * irc_smart_filter *;" # filter out join/leave mgs
+cmd="${cmd}/script install buffers.pl;/wait 500ms;" # show buffers list in left aside
+weechat -r "${cmd};/quit"
+
+echo "----- configuring irc servers..."
+
+servers=`cat conf.yaml | shyaml keys servers`
+username=`cat conf.yaml | shyaml get-value username`
+email=`cat conf.yaml | shyaml get-value email`
+  
+for server in $servers
+do
+  echo "---------- configuring ${server}..."
+
+  # retrieve static configs
+  domain=`get-srv-cfg ${server} domain`
+  password=`get-srv-cfg ${server} password`
+  
+  # configure server
+  cmd="/server add ${server} ${domain} -ssl -autoconnect;"
+
+  # configure server to use tor
+  if [ $server != 'freenode' ] && [ $server != 'oftc' ]
+  then
+    # we have to connect to freenode once on clearnet
+    # to register via TLS SASL before connecting over tor
+    # yes. annoying! see: https://freenode.net/news/tor-online
+    cmd="${cmd}/set irc.server.${server}.proxy 'tor';"
+  fi
+
+  # store sasl username pass configs in weechat
+  cmd="${cmd}/set irc.server.${server}.sasl_mechanism plain;"
+  cmd="${cmd}/set irc.server.${server}.sasl_username ${username};"
+  cmd="${cmd}/set irc.server.${server}.sasl_password ${password};"
+
+  # register sasl username/pass w/ irc server
+  cmd="${cmd}/connect ${server};"
+  cmd="${cmd}/buffer ${server};"
+  cmd="${cmd}/msg nickserv register ${password} ${email};"
+  cmd="${cmd}/msg nickserv identify ${password};"
+  #cmd="${cmd}/reconnect ${server};"
+
+  #run it!!!
+  weechat -r "${cmd}/quit"
+done
+
+#
+# cleanup
+#
+popd

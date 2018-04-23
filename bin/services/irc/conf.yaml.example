@@ -5,6 +5,8 @@ servers:
   freenode:
     domain: freenodeok2gncmy.onion
     ssl: false
+    password: l0l
   oftc:
     domain: irc.oftc.net/6697
     ssl: true
+    password: t3h3
