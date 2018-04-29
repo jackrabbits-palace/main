@@ -1,0 +1,75 @@
+#!/usr/bin/env bash 
+
+#
+# setup
+#
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./common/check-root || exit $? # enforce root
+
+#
+# script
+#
+
+echo "----- reading configs"
+
+version=`cat conf.yaml | shyaml get-value version`
+download_url=`cat conf.yaml | shyaml get-value download_url`
+username=`cat conf.yaml | shyaml get-value username`
+password=`cat conf.yaml | shyaml get-value password`
+
+echo "----- installing system dependencies"
+
+./install-dependencies
+
+echo "----- downloading artifacts"
+
+cd "/usr/share/nginx"
+wget "${download_url}nextcloud-${version}.tar.bz2"
+wget "${download_url}nextcloud-${version}.tar.bz2.sha256"
+wget "${download_url}nextcloud-${version}.tar.bz2.asc"
+
+echo "----- checking signatures"
+
+wget https://nextcloud.com/nextcloud.asc
+gpg --import nextcloud.asc
+rm nextcloud.asc
+
+gpg_result=`gpg \
+  --verify nextcloud-${version}.tar.bz2.asc nextcloud-${version}.tar.bz2 \
+  2> /dev/null \
+  && echo valid || echo invalid`
+
+if [ $gpg_result == 'invalid' ]
+then
+  echo "invalid gpg signature"
+  exit 1
+fi
+
+sha256_result=`sha256sum \
+  -c nextcloud-${version}.tar.bz2.sha256 < nextcloud-${version}.tar.bz2 \
+  | grep OK \
+  | if [ -n $1]; then echo valid; else echo invalid; fi`
+
+if [ $sha256_result == 'invalid' ]
+then
+  echo "invalid shasum"
+  exit 1
+fi
+
+echo "+++++ GOOD SIGNATURES"
+
+echo "----- extracting tarball"
+
+tar -xjf nextcloud-${version}.tar.bz2
+
+echo "----- setting permissions"
+
+chown www-data:www-data /usr/share/nginx/nextcloud -R
+
+#
+# cleanup
+#
+popd
+echo "----- configuring nextcloud"
+/configure

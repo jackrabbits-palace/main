@@ -1,0 +1,35 @@
+#!/usr/bin/env bash 
+
+#
+# setup
+#
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./common/check-root || exit $? # enforce root
+
+#
+# script
+#
+echo "---------- installing common system dependencies"
+
+./common/install-dependencies
+
+echo "---------- installing nextcloud system dependencies"
+
+DEBIAN_FRONTEND=noninteractive apt install -yq\
+               mariadb-server \
+               php7.0-gd \
+               php7.0-json \
+               php7.0-mysql \
+               php7.0-curl \
+               php7.0-mbstring \
+               php7.0-intl \
+               php7.0-mcrypt \
+               php-imagick \
+               php7.0-xml \
+               php7.0-zip
+
+#
+# cleanup
+#
+popd
