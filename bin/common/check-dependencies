@@ -6,7 +6,7 @@ then
   # TODO: (ag|21 Apr 2018)
   # - we should list these in a file and have a single source of truth
   #   for both `install-dependencies` and `check-dependencies`
-  dependencies="build-essential dirmngr nginx python python-pip shyaml ufw"
+  dependencies="build-essential curl dirmngr nginx python python-pip shyaml ufw"
 fi
 for dependency in $dependencies
 do
