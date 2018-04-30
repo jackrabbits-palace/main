@@ -6,5 +6,5 @@
 # for now, just run these commands from a shell if you want to
 
 echo "[OOPS]: this command will not work as expected. see TODO in ./bin/ssh-key-load for workaround."
-eval "$(ssh-agent -s)"
+eval `ssh-agent -s`
 ssh-add ~/.ssh/id_${HOSTNAME}_${USER}

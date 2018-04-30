@@ -11,8 +11,6 @@ cd `dirname "$0"` # cd to script path
 
 # CONFIGURE
 
-source ../.env/${remote_hostname}
-
 if [ -e /var/cache/ddclient/ddclient.cache ]
 then
   echo "----- claring cache in /var/cache/ddclient/ddclient.cache"
@@ -60,14 +58,9 @@ do
   echo "login=${login}" >> /etc/ddclient.conf
   echo "password=${password}" >> /etc/ddclient.conf
 
-  for subdomain in $subdomains
-  do
-    echo "${subdomain}.${hostname}" >> /etc/ddclient.conf
-  done
-
   echo "+++++ added configuration for ${hostname}"
 done
-NOTICE.txt
+
 echo "----- publishing new IP to remote nameserver"
 
 ddclient

@@ -169,4 +169,7 @@ here is a [useful blog post](https://blog.dembowski.net/2013/namecheap-dynamic-d
    ```
 8. start the ddclient daemon, `sudo service ddclient start`
 
+##### Subdomains
+When creating subdomains, they will most likely all point to the same ip address as the root domain (`@.mydomain.tld`), so instead of creating A-Records for each subdomain *and* including an entry in the `ddclient.conf`, you could alternatively create CName Records which just point to your root domain (which we have done and recommend you do).
+
 this is another [good blog post](https://samhobbs.co.uk/2015/01/dynamic-dns-ddclient-raspberry-pi-and-ubuntu) which says something at the end about dynamic dns providers timing out if there are no updates in a while, but i won't worry about that for now.
