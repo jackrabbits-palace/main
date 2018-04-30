@@ -1,16 +1,13 @@
 #!/usr/bin/env bash
 
 # USAGE (for a tld, eg: "slime.church"):
-# $ ./bin/configure-ddclient slime.church
+# $ ./bin/configure-ddclient slimechurch
 
 # SETUP
 pushd `pwd` # save original path
 cd `dirname "$0"` # cd to script path
 ./common/check-root || exit $? # enforce root
-
-# TODO: (aguestuser|16 Apr 2018)
-# extract this to yaml, so we can configure many hostnames
-$remote_hostname=$1
+./common/check-dependencies "shyaml ddclient" || exit $?
 
 # CONFIGURE
 
@@ -22,21 +19,55 @@ then
   rm /var/cache/ddclient/ddclient.cache
 fi
 
-echo "----- adding configuration for ${remote_hostname} to /etc/ddclient.conf"
+echo "----- deleting old contents of /etc/ddclient.conf"
 
-echo "" >> /etc/ddclient.conf
-echo "######################################" >> /etc/ddclient.conf
-echo "# config for ${remote_hostname}" >> /etc/ddclient.conf
-echo "######################################" >> /etc/ddclient.conf
-echo "" >> /etc/ddclient.conf
-echo "use=web, web=${DDNS_WEB}" >> /etc/ddclient.conf
-echo "ssl=yes" >> /etc/ddclient.conf
-echo "protocol=${DDNS_PROTOCOL}" >> /etc/ddclient.conf
-echo "server=${DDNS_SERVER}" >> /etc/ddclient.conf
-echo "login=${DDNS_LOGIN}" >> /etc/ddclient.conf
-echo "password=${DDNS_PASSWORD}" >> /etc/ddclient.conf
-echo "@.${remote_hostname}" >> /etc/ddclient.conf
+rm /etc/ddclient.conf
+touch /etc/ddclient.conf
+echo "# /etc/ddclient.conf" >> /etc/ddclient.conf
 
+echo "----- writing new configs from conf.yaml..."
+
+domains=`cat conf.yaml | shyaml keys domains`
+
+get-ddns-config(){
+  domain=$1; config=$2
+  default=`cat conf.yaml | shyaml get-value ddns.defaults.${config}`
+  cat conf.yaml | shyaml get-value domains.${domain}.ddns.${config} $default
+}
+
+for domain in $domains
+do
+  echo "----- adding configuration for ${domain}..."
+
+  hostname=`cat conf.yaml | shyaml get-value domains.${domain}.hostname`
+  subdomains=`cat conf.yaml | shyaml get-values domains.${domain}.subdomains`
+
+  web=`get-ddns-config ${domain} web`
+  protocol=`get-ddns-config ${domain} protocol`
+  server=`get-ddns-config ${domain} server`
+  login=`get-ddns-config ${domain} login`
+  password=`get-ddns-config ${domain} password`
+
+  echo "" >> /etc/ddclient.conf
+  echo "######################################" >> /etc/ddclient.conf
+  echo "# config for ${hostname}" >> /etc/ddclient.conf
+  echo "######################################" >> /etc/ddclient.conf
+  echo "" >> /etc/ddclient.conf
+  echo "use=web, web=${web}" >> /etc/ddclient.conf
+  echo "ssl=yes" >> /etc/ddclient.conf
+  echo "protocol=${protocol}" >> /etc/ddclient.conf
+  echo "server=${server}" >> /etc/ddclient.conf
+  echo "login=${login}" >> /etc/ddclient.conf
+  echo "password=${password}" >> /etc/ddclient.conf
+
+  for subdomain in $subdomains
+  do
+    echo "${subdomain}.${hostname}" >> /etc/ddclient.conf
+  done
+
+  echo "+++++ added configuration for ${hostname}"
+done
+NOTICE.txt
 echo "----- publishing new IP to remote nameserver"
 
 ddclient
