@@ -1,7 +1,6 @@
 /keyrings/live/pubring.gpg~
 /keyrings/live/pubring.kbx~
 /keyrings/live/secring.gpg
-/.env/serious.town
 /bin/services/irc/conf.yaml
 /bin/services/nextcloud/conf.yaml
 /bin/proxy/conf.yaml
