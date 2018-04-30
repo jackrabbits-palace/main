@@ -1,1 +1,2 @@
 .env/serious.town
+bin/proxy/conf.yaml

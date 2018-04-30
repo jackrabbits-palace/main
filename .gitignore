@@ -4,3 +4,4 @@
 /.env/serious.town
 /bin/services/irc/conf.yaml
 /bin/services/nextcloud/conf.yaml
+/bin/proxy/conf.yaml

@@ -1,0 +1,34 @@
+ddns_defaults:
+  web: dynamicdns.park-your-domain.com/getip
+  protocol: namecheap
+  server: dynamicdns.park-your-domain.com
+domains:
+  jackrabbits-palace:
+    hostname: jackrabbitspal.us
+    ddns:
+      login: jackrabbitspal.us
+      password: YOUR_PASSWORD_HERE
+      web: default
+      protocol: default
+      server: default
+  serioustown:
+    hostname: serious.town
+    subdomains:
+      - nextcloud
+    ddns:
+      login: serious.town
+      password: YOUR_PASSWORD_HERE
+      web: default
+      protocol: default
+      server: default
+  slimechurch:
+    hostname: slime.church
+    subdomains:
+      - deep
+      - small
+    ddns:
+      login: slime.church
+      password: YOUR_PASSWORD_HERE
+      web: default
+      protocol: default
+      server: default
