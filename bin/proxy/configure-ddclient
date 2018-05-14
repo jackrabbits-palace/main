@@ -13,7 +13,7 @@ cd `dirname "$0"` # cd to script path
 
 if [ -e /var/cache/ddclient/ddclient.cache ]
 then
-  echo "----- claring cache in /var/cache/ddclient/ddclient.cache"
+  echo "----- clearing cache in /var/cache/ddclient/ddclient.cache"
   rm /var/cache/ddclient/ddclient.cache
 fi
 
