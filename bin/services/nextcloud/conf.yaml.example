@@ -1,4 +1,7 @@
 version: 13.0.2
 download_url: https://download.nextcloud.com/server/releases/
-username: nextcloud
-password: your_password_here
+db_name: nextcloud
+db_username: YOUR_DB_ADMIN_NAME_HERE
+db_password: YOUR_DB_PASSWORD_HERE
+admin_username: YOUR_ADMIN_USERNAME_HERE
+admin_password: YOUR_ADMIN_PASSWORD_HERE

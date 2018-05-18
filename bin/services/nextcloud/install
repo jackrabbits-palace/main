@@ -7,16 +7,27 @@ pushd `pwd` # save original path
 cd `dirname "$0"` # cd to script path
 ./common/check-root || exit $? # enforce root
 
+# note (aguestuser):
+# - this instal ldir assumes occ/apache install (https://docs.nextcloud.com/server/13/admin_manual/configuration_server/occ_command.html#command-line-installation-label)
+# - for nginx we'd use `/usr/shar/nginx` but also have to do some more annoying stuff by hand.
+# - breadcrumbs:
+#   - https://docs.nextcloud.com/server/13/admin_manual/installation/nginx.html
+#   - https://www.linuxbabe.com/ubuntu/install-nextcloud-11-ubuntu-16-04-nginx-config
+install_dir="/var/www"
+
 #
 # script
 #
 
-echo "----- reading configs"
+# echo "----- reading configs"
 
 version=`cat conf.yaml | shyaml get-value version`
 download_url=`cat conf.yaml | shyaml get-value download_url`
-username=`cat conf.yaml | shyaml get-value username`
-password=`cat conf.yaml | shyaml get-value password`
+db_name=`cat conf.yaml | shyaml get-value db_name`
+db_username=`cat conf.yaml | shyaml get-value db_username`
+db_password=`cat conf.yaml | shyaml get-value db_password`
+admin_username=`cat conf.yaml | shyaml get-value admin_username`
+admin_password=`cat conf.yaml | shyaml get-value admin_password`
 
 echo "----- installing system dependencies"
 
@@ -24,7 +35,7 @@ echo "----- installing system dependencies"
 
 echo "----- downloading artifacts"
 
-cd "/usr/share/nginx"
+cd ${install_dir}
 wget "${download_url}nextcloud-${version}.tar.bz2"
 wget "${download_url}nextcloud-${version}.tar.bz2.sha256"
 wget "${download_url}nextcloud-${version}.tar.bz2.asc"
@@ -63,13 +74,34 @@ echo "----- extracting tarball"
 
 tar -xjf nextcloud-${version}.tar.bz2
 
+echo "----- removing tarball artifacts"
+
+rm nextcloud-*
+
 echo "----- setting permissions"
 
-chown www-data:www-data /usr/share/nginx/nextcloud -R
+chown www-data:www-data ${install_dir} -R
+
+echo "----- preparing mysql database"
+
+mysql -u root -e "\
+  create database ${db_name}; \
+  create user ${db_username}@localhost identified by '${db_password}'; \
+  grant all privileges on ${db_name}.* to ${db_username}@localhost identified by '${db_password}';"
+
+echo "----- running occ install script"
+
+cd ${install_dir}/nextcloud
+
+sudo -u www-data php occ maintenance:install \
+     --database "mysql" \
+     --database-name ${db_name} \
+     --database-user ${db_username} \
+     --database-pass ${db_password} \
+     --admin-user ${admin_username} \
+     --admin-pass ${admin_password}
 
 #
 # cleanup
 #
 popd
-echo "----- configuring nextcloud"
-/configure
