@@ -14,7 +14,7 @@ then
 fi
 
 cd /var/www/hello
-python3 -m http.server 80
+python3 -m http.server 5000
 
 # CLEANUP
 popd
