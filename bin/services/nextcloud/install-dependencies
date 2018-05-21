@@ -17,6 +17,8 @@ echo "---------- installing common system dependencies"
 echo "---------- installing nextcloud system dependencies"
 
 DEBIAN_FRONTEND=noninteractive apt install -yq\
+               apache2 \
+               libapache2-mod-php7.0 \
                mariadb-server \
                php7.0-gd \
                php7.0-json \
