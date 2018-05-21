@@ -1,0 +1,6 @@
+some_username:
+  password: SOME_PASSWORD_HERE
+  ssh_pubkey: SOME_PUBKEY_HERE
+some_other_username:
+  password: SOME_OTHER_PASSWORD_HERE
+  ssh_pubkey: SOME_OTHER_PUBKEY_HERE

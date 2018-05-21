@@ -1,0 +1,28 @@
+#!/usr/bin/env bash -
+
+#
+# setup
+#
+
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./check-root || exit $? # enforce root
+
+#
+# script 
+#
+
+echo "-------- blocking root ssh access"
+sed -i "s/PermitRootLogin yes/PermitRootLogin no/g"  /etc/ssh/sshd_config
+sed -i "s/PermitRootLogin without-password/PermitRootLogin no/g"  /etc/ssh/sshd_config
+sed -i "s/#PermitRootLogin/PermitRootLogin/g"  /etc/ssh/sshd_config
+
+echo "-------- restarting ssh"
+systemctl reload ssh
+
+
+#
+# cleanup
+#
+
+popd

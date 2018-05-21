@@ -1,0 +1,54 @@
+#!/usr/bin/env bash -
+
+#
+# setup
+#
+
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./check-root || exit $? # enforce root
+
+#
+# script 
+#
+
+echo "---- reading configs"
+usernames=`cat admins.yml | shyaml keys`
+
+for username in $usernames
+do
+  echo "---- configuring account for ${username}"
+  ssh_pubkey=`cat admins.yml | shyaml get-values ${username}.ssh_pubkey`
+  password=`cat admins.yml | shyaml get-values ${username}.password`
+  
+  echo "-------- creating account"
+  mkpasswd ${password} | useradd -m -g sudo -p $1 -s /bin/bash $username
+
+  echo "-------- granting no-password sudo"
+  echo "${username} ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+  echo "-------- authorizing ssh key"
+  mkdir -p /home/${username}/.ssh
+  echo $ssh_pubkey >> /home/${username}/.ssh/authorized_keys
+done
+
+echo "---- disabling password ssh access"
+sed -i "s/#PasswordAuthentication yes/PasswordAuthentication no/g"  /etc/ssh/sshd_config
+
+
+echo "-------- restarting ssh"
+systemctl reload ssh
+
+echo "-------- clearing history"
+history -w
+history -c
+
+
+echo "---- SUCCESSFULLY configured admin accounts"
+echo "---- ssh into the box and if it works, run ./block-root-ssh"
+
+#
+# cleanup
+#
+
+popd
