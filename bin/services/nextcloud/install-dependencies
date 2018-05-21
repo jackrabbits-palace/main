@@ -10,11 +10,11 @@ cd `dirname "$0"` # cd to script path
 #
 # script
 #
-echo "---------- installing common system dependencies"
+echo "-------- installing common system dependencies"
 
 ./common/install-dependencies
 
-echo "---------- installing nextcloud system dependencies"
+echo "-------- installing nextcloud system dependencies"
 
 DEBIAN_FRONTEND=noninteractive apt install -yq\
                apache2 \
@@ -30,6 +30,9 @@ DEBIAN_FRONTEND=noninteractive apt install -yq\
                php-imagick \
                php7.0-xml \
                php7.0-zip
+
+echo "-------- configuring apache"
+./configure-apache
 
 #
 # cleanup

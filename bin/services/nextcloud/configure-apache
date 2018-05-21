@@ -1,0 +1,56 @@
+#!/usr/bin/env bash 
+
+#
+# setup
+#
+pushd `pwd` # save original path
+cd `dirname "$0"` # cd to script path
+./common/check-root || exit $? # enforce root
+
+#
+# script
+#
+
+echo "---- creating apache conf file"
+
+conf_path=/etc/apache2/sites-available/nextcloud.conf
+touch $conf_path
+
+# TODO: also configure ServerName (for tls to work)
+
+echo "" >> $conf_path
+echo 'Alias /nextcloud "/var/www/nextcloud/"' >> $conf_path
+echo '' >> $conf_path
+echo '<Directory /var/www/nextcloud/>' >> $conf_path
+echo '  Options +FollowSymlinks' >> $conf_path
+echo '  AllowOverride All' >> $conf_path
+echo '  Satisfy Any' >> $conf_path
+echo '' >> $conf_path
+echo '  <IfModule mod_dav.c>' >> $conf_path
+echo '    Dav off' >> $conf_path
+echo '  </IfModule>' >> $conf_path
+echo '' >> $conf_path
+echo '  SetEnv HOME /var/www/nextcloud' >> $conf_path
+echo '  SetEnv HTTP_HOME /var/www/nextcloud' >> $conf_path
+echo '' >> $conf_path
+echo '</Directory>' >> $conf_path
+
+ln -s /etc/apache2/sites-available/nextcloud.conf /etc/apache2/sites-enabled/nextcloud.conf
+
+echo "---- enabling apache modules"
+
+a2enmod rewrite
+a2enmod headers
+a2enmod env
+a2enmod dir
+a2enmod mime
+a2enmod setenvif
+
+echo "---- restarting apache"
+
+systemctl restart apache2
+
+#
+# cleanup
+#
+popd
