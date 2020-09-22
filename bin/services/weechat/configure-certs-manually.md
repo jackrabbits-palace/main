@@ -26,17 +26,24 @@ Issue config commands inside weechat:
 ```
 /connect freenode
 /buffer freenode
+
+/msg nickserv register ${password} ${email}
 /msg nickserv identify ${password}
-/msg nickserv cert add ${fingerprint}
+/msg nickserv cert add ${cert}
 
 /set irc.server.freenode.ssl_cert %h/certs/freenode.pem
 /set irc.server.freenode.sasl_mechanism external
 /set irc.server.freenode.ssl_priorities 'NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:%COMPAT'
-/set irc.server.freenode.addresses 'freenodeok2gncmy.onion/7000'
 /set irc.server.freenode.ssl_verify off
 /set irc.server.freenode.proxy 'tor'
 
 /reconnect freenode
+```
+
+note, for v3 onions, you might need to use:
+
+```
+/set irc.server.freenode.addresses 'ajnvpgl6prmkb7yktvue6im5wiedlz2w32uhcwaamdiecdrfpwwgnlqd.onion/7000'
 ```
 
 ## OFTC
@@ -62,7 +69,7 @@ Issue config commands inside weechat:
 /connect oftc
 /buffer oftc
 /msg nickserv identify ${password}
-/msg nickserv cert add ${fingerprint}
+/msg nickserv cert add ${cert}
 
 /set irc.server.oftc.ssl_cert %h/certs/oftc.pem
 /set irc.server.oftc.sasl_mechanism external
